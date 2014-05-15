@@ -21,7 +21,7 @@
 	url = https://github.com/android-rooting-tools/libfb_mem_exploit.git
 [submodule "libexploit"]
 	path = libexploit
-	url = https://github.com/android-rooting-tools/libexploit.git
+	url = git@github.com:scoty755/libexploit.git
 [submodule "libmsm_cameraconfig_exploit"]
 	path = libmsm_cameraconfig_exploit
 	url = git://github.com/fi01/libmsm_cameraconfig_exploit.git
