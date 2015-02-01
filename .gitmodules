@@ -6,4 +6,4 @@
 	url = https://github.com/android-rooting-tools/libkallsyms.git
 [submodule "libexploit"]
 	path = libexploit
-	url = https://github.com/android-rooting-tools/libexploit.git
+	url = https://github.com/scoty755/libexploit.git
