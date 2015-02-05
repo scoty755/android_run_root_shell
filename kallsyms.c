@@ -12,7 +12,7 @@ kallsyms_exist(void)
   struct stat st;
 
   if (stat("/proc/kallsyms", &st) < 0) {
-    return false;
+    return false; // "/proc/kallsyms"の状態を取得
   }
 
   if  (st.st_mode & S_IROTH) {
@@ -31,9 +31,9 @@ kallsyms_get_symbol_address(const char *symbol_name)
   void *address;
   int ret;
 
-  fp = fopen("/proc/kallsyms", "r");
+  fp = fopen("/proc/kallsyms", "r"); // "/proc/kallsyms"を開く
   if (!fp) {
-    printf("Failed to open /proc/kallsyms due to %s.", strerror(errno));
+    printf("Failed to open /proc/kallsyms due to %s.", strerror(errno)); // "/proc/kallsyms"の展開に失敗
     return 0;
   }
 
@@ -45,7 +45,7 @@ kallsyms_get_symbol_address(const char *symbol_name)
 
     if (!strcmp(function, symbol_name)) {
       fclose(fp);
-      return address;
+      return address; // シンボルネームが一致したらアドレスを返す
     }
   }
   fclose(fp);

@@ -19,7 +19,7 @@ setup_prepare_kernel_cred_address(void)
   prepare_kernel_cred = (prepare_kernel_cred_t)device_get_symbol_address(DEVICE_SYMBOL(prepare_kernel_cred));
 
   if (!prepare_kernel_cred && kallsyms_exist()) {
-    prepare_kernel_cred = kallsyms_get_symbol_address("prepare_kernel_cred");
+    prepare_kernel_cred = kallsyms_get_symbol_address("prepare_kernel_cred"); //prepare_kernel_credのアドレスを返す
   }
 
   return !!prepare_kernel_cred;
@@ -35,7 +35,7 @@ setup_commit_creds_address(void)
   commit_creds = (commit_creds_t)device_get_symbol_address(DEVICE_SYMBOL(commit_creds));
 
   if (!commit_creds && kallsyms_exist()) {
-    commit_creds = kallsyms_get_symbol_address("commit_creds");
+    commit_creds = kallsyms_get_symbol_address("commit_creds"); // commit_credsのアドレスを返す
   }
 
   return !!commit_creds;
