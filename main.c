@@ -266,7 +266,7 @@ find_ptmx_fops_address(kallsyms *info, void *mem, size_t length)
     return false;
   }
 
-  return setup_ptmx_fops_address_in_memory(mem, length, &hint);
+  return setup_ptmx_fops_address_in_memory(mem, length, &hint); // ptmx_open,tty_release,tty_fasyncを基にptmx_fopsのアドレスを算出
 }
 
 /* シンボルアドレスの探索ここから */
