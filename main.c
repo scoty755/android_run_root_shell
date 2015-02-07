@@ -110,6 +110,7 @@ is_cpu_timer_valid(struct list_head *cpu_timer)
   return true;
 }
 
+/* commit_creds() が失敗した際、credを直接書き換えるここから */
 static void
 obtain_root_privilege_by_modify_task_cred(void)
 {
@@ -169,6 +170,7 @@ obtain_root_privilege_by_modify_task_cred(void)
     }
   }
 }
+/* commit_creds() が失敗した際、credを直接書き換えるここまで */
 
 static void
 obtain_root_privilege_by_commit_creds(void)
