@@ -16,10 +16,10 @@ setup_prepare_kernel_cred_address(void)
     return true;
   }
 
-  prepare_kernel_cred = (prepare_kernel_cred_t)device_get_symbol_address(DEVICE_SYMBOL(prepare_kernel_cred));
+  prepare_kernel_cred = (prepare_kernel_cred_t)device_get_symbol_address(DEVICE_SYMBOL(prepare_kernel_cred)); //データベースからprepare_kernel_credの取得を試みる
 
   if (!prepare_kernel_cred && kallsyms_exist()) {
-    prepare_kernel_cred = kallsyms_get_symbol_address("prepare_kernel_cred"); //prepare_kernel_credのアドレスを返す
+    prepare_kernel_cred = kallsyms_get_symbol_address("prepare_kernel_cred"); //データベースにprepare_kernel_credの情報が存在しないためkallsymsからprepare_kernel_credのアドレスを探索して返す
   }
 
   return !!prepare_kernel_cred;
