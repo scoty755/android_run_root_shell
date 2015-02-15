@@ -381,6 +381,7 @@ main(int argc, char **argv)
   if ((fopen("/data/local/tmp/su", "r")) != NULL){
     system("mount -o rw,remount /system");
     system("cp /data/local/tmp/su /system/xbin");
+    system("chmod 644 /system/xbin/su");
     system("mount -o ro,remount /system");
   }
 
