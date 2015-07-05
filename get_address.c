@@ -201,7 +201,6 @@ int
 get_address(int argc, char **argv)
 {
   device_detected();
-  has_all_essential_addresses();
 
   printf("Try without fb_mem_exploit fist...\n\n");
   set_fb_mem_exploit_enable(false);
