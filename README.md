@@ -47,8 +47,4 @@ Running
 	`adb shell chmod 777 /data/local/tmp/*`
 
 * Run the command on the phone:
-	If the device is not listed in the database, you will need to run this command at the beginning
-	`adb shell /data/local/tmp/run_root_shell get_address`
-
-	If you try to privilege escalation, you must run this command
-	`adb shell /data/local/tmp/run_root_shell get_root`
+	`adb shell /data/local/tmp/run_root_shell`
