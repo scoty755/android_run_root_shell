@@ -164,8 +164,6 @@ setup_variables(void)
     printf("Failed to get ptmx_fops address.\n");
   }
 
-  print_reason_device_not_supported();
-
   return false;
 }
 
@@ -197,11 +195,9 @@ register_address(void)
 #endif /* HAS_SET_SYMBOL_ADDRESS */
 }
 
-int
-get_address(int argc, char **argv)
+bool
+get_address(void)
 {
-  device_detected();
-
   printf("Try without fb_mem_exploit fist...\n\n");
   set_fb_mem_exploit_enable(false);
 
@@ -212,13 +208,13 @@ get_address(int argc, char **argv)
     set_fb_mem_exploit_enable(true);
     if (!setup_variables()) {
       printf("Failed to setup variables.\n");
-      exit(EXIT_FAILURE);
+      return false;
     }
   }
 
   register_address();
 
-  exit(EXIT_SUCCESS);
+  return true;
 }
 /*
 vi:ts=2:nowrap:ai:expandtab:sw=2

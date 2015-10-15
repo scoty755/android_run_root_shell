@@ -5,7 +5,6 @@ include $(CLEAR_VARS)
 LOCAL_SRC_FILES := \
   cred.c \
   get_address.c \
-  get_root.c \
   kallsyms.c \
   main.c \
   mm.c \
