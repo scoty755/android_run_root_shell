@@ -354,14 +354,26 @@ setup_variables(void)
     printf("Failed to get ptmx_fops address.\n");
   }
 
-  if (try_get_symbol()) {
-    printf("This device information has been added to the database!\n");
-    printf("Please to retry.\n");
-  }
-
   print_reason_device_not_supported();
 
   return false;
+}
+
+bool
+try_lookup_symbol(void)
+
+if (setup_variables()) {
+    return true;
+}
+
+
+if (try_get_symbol()) {
+    printf("This device information has been added to the database!\n");
+    return true;
+}
+
+  return false;
+
 }
 
 int
@@ -379,7 +391,7 @@ main(int argc, char **argv)
 
   device_detected();
 
-  if (!setup_variables()) {
+  if (!try_lookup_symbol()) {
     printf("Failed to setup variables.\n");
     exit(EXIT_FAILURE);
   }
